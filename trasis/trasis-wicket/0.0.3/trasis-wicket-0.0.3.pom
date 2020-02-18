@@ -1,0 +1,217 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>trasis</groupId>
+	<artifactId>trasis-wicket</artifactId>
+	<version>0.0.3</version>
+	<packaging>jar</packaging>
+
+	<properties>
+		<compiler.version>1.8</compiler.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<jetty.version>9.4.15.v20190215</jetty.version>
+		<log4j.version>2.11.2</log4j.version>
+		<wicket.version>8.4.0</wicket.version>
+
+
+		<github.global.server>github</github.global.server>
+		<github-repo.ownerName>trasisjp</github-repo.ownerName>
+		<github-repo.repositoryName>mvn-repo</github-repo.repositoryName>
+	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>internal.repos</id>
+			<name>Temporary Staging Repository</name>
+			<url>file://${project.build.directory}/mvn-repo</url>
+		</repository>
+	</distributionManagement>
+
+	<scm>
+		<connection>scm:git:ssh://git@git.trasis.jp:29418/${project.groupId}/${project.artifactId}.git</connection>
+		<url>scm:git:ssh://git@git.trasis.jp:29418/${project.groupId}/${project.artifactId}.git</url>
+		<developerConnection>scm:git:ssh://git@git.trasis.jp:29418/${project.groupId}/${project.artifactId}.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<build>
+		<!-- ビルド作業ディレクトリ -->
+		<directory>${directory}</directory>
+		<outputDirectory>${directory}/classes</outputDirectory>
+		<testOutputDirectory>${directory}/test-classes</testOutputDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<source>${compiler.version}</source>
+					<target>${compiler.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<version>0.12</version>
+				<configuration>
+					<!-- Git コミットメッセージ -->
+					<message>Maven artifacts for ${project.version}</message>
+					<noJekyll>true</noJekyll>
+					<!-- distributionManagement の url と一致させる -->
+					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+					<!-- リモートブランチ名 -->
+					<branch>refs/heads/master</branch>
+					<includes>
+						<include>**/*</include>
+					</includes>
+					<!-- Github リポジトリ名 -->
+					<repositoryName>${github-repo.repositoryName}</repositoryName>
+					<!-- Github リポジトリユーザー名 -->
+					<repositoryOwner>${github-repo.ownerName}</repositoryOwner>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.5.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.2</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.scm</groupId>
+						<artifactId>maven-scm-provider-gitexe</artifactId>
+						<version>1.9.2</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<!-- Gitのタグ名をどうするか -->
+					<tagNameFormat>v@{project.version}</tagNameFormat>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!-- ======================================== -->
+		<!-- ビルドディレクトリ -->
+
+		<profile>
+			<id>default</id>
+
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+
+			<properties>
+				<directory>target</directory>
+			</properties>
+		</profile>
+
+		<!-- Eclipse ビルド用 -->
+
+		<profile>
+			<id>eclipse-folders</id>
+			<properties>
+				<directory>target-eclipse</directory>
+			</properties>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<!-- Logging -->
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+
+		<!-- Wicket -->
+
+		<dependency>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket-core</artifactId>
+			<version>${wicket.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket-auth-roles</artifactId>
+			<version>${wicket.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket-extensions</artifactId>
+			<version>${wicket.version}</version>
+		</dependency>
+
+		<!-- sevlet/jsp のバージョン: http://tomcat.apache.org/whichversion.html Tomcat
+			6: 2.5/2.1 Tomcat 7: 3.0/2.2 Tomcat 8: 3.1/2.3 Tomcat 9: 4.0/2.3 -->
+		<!-- <dependency> <groupId>org.apache.tomcat.embed</groupId> <artifactId>tomcat-embed-core</artifactId>
+			<version>8.5.2</version> <scope>test</scope> </dependency> <dependency> <groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-logging-juli</artifactId> <version>8.5.2</version>
+			<scope>test</scope> </dependency> -->
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jetty.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jetty.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-plus</artifactId>
+			<version>${jetty.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>javax.servlet.jsp-api</artifactId>
+			<version>2.3.3</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- etc -->
+	</dependencies>
+</project>
